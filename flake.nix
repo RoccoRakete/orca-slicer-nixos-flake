@@ -3,10 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs =
-    { self, nixpkgs }:
+    { self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -17,11 +18,12 @@
       };
 
       orcaSrc = {
-        version = "2.3.2";
-        srcHash = "sha256-c1WTODLrXGtyJWkEueOz5jHhPbA/JFcMeAwhpvoKnKo=";
+        version = "2.4.0-alpha";
+        srcHash = "sha256-xhmmHtVsLn4d1Q577ZNXYPzwsBsScfecx4ckLpceJqU=";
       };
 
       orca-slicer = pkgs.callPackage ./package.nix {
+        inherit (self) inputs;
         orcaVersion = orcaSrc.version;
         orcaSrcHash = orcaSrc.srcHash;
       };

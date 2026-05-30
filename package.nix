@@ -1,17 +1,17 @@
-{ stdenv, lib, binutils, fetchFromGitHub, fetchpatch, cmake, pkg-config
+{ inputs, stdenv, lib, binutils, fetchFromGitHub, fetchpatch, cmake, pkg-config
 , wrapGAppsHook3, boost186, cereal, cgal_5, curl, dbus, draco, eigen, expat
 , ffmpeg, gcc-unwrapped, glew, glfw, glib, glib-networking, gmp, gst_all_1
 , gtest, gtk3, hicolor-icon-theme, ilmbase, libsecret, libpng, mpfr, nlopt
 , opencascade-occt_7_6, openvdb, opencv, pcre, systemd, onetbb, webkitgtk_4_1
-, wxGTK31, xorg, libnoise, orcaVersion ? "2.3.1"
+, wxGTK31, wxwidgets_3_3, xorg, libnoise, orcaVersion ? "2.3.1"
 , orcaSrcHash ? "sha256-RdMBx/onLq58oI1sL0cHmF2SGDfeI9KkPPCbjyMqECI="
 , withSystemd ? stdenv.hostPlatform.isLinux, }:
 let
-  wxGTK' = (wxGTK31.override {
-    withCurl = true;
-    withEGL = false;
-    withPrivateFonts = true;
-    withWebKit = true;
+  wxGTK' = (wxwidgets_3_3.override {
+    # withCurl = true;
+    # withEGL = false;
+    # withPrivateFonts = true;
+    # withWebKit = true;
   }).overrideAttrs (old: {
     buildInputs = old.buildInputs ++ [ libsecret ];
     configureFlags = old.configureFlags
@@ -43,7 +43,6 @@ in stdenv.mkDerivation (finalAttrs: {
     curl
     dbus
     draco
-    eigen
     expat
     ffmpeg
     gcc-unwrapped
@@ -72,17 +71,19 @@ in stdenv.mkDerivation (finalAttrs: {
     xorg.libX11
     opencv.cxxdev
     libnoise
-  ] ++ lib.optionals withSystemd [ systemd ] ++ finalAttrs.checkInputs;
+  ] ++ (with inputs.nixpkgs-unstable.legacyPackages.${stdenv.hostPlatform.system}; [
+    eigen_5
+  ]) ++ lib.optionals withSystemd [ systemd ] ++ finalAttrs.checkInputs;
 
   patches = [
     ./patches/0001-not-for-upstream-CMakeLists-Link-against-webkit2gtk-.patch
     ./patches/dont-link-opencv-world-orca.patch
-    (fetchpatch {
-      name = "pr-7650-configurable-update-check.patch";
-      url =
-        "https://github.com/OrcaSlicer/OrcaSlicer/commit/d10a06ae11089cd1f63705e87f558e9392f7a167.patch";
-      hash = "sha256-t4own5AwPsLYBsGA15id5IH1ngM0NSuWdFsrxMRXmTk=";
-    })
+    # (fetchpatch {
+    #   name = "pr-7650-configurable-update-check.patch";
+    #   url =
+    #     "https://github.com/OrcaSlicer/OrcaSlicer/commit/d10a06ae11089cd1f63705e87f558e9392f7a167.patch";
+    #   hash = "sha256-t4own5AwPsLYBsGA15id5IH1ngM0NSuWdFsrxMRXmTk=";
+    # })
   ];
 
   doCheck = true;
