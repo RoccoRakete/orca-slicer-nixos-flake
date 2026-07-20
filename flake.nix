@@ -18,8 +18,8 @@
       };
 
       orcaSrc = {
-        version = "2.4.0-alpha";
-        srcHash = "sha256-xhmmHtVsLn4d1Q577ZNXYPzwsBsScfecx4ckLpceJqU=";
+        version = "2.4.2";
+        srcHash = "sha256-gUwLC0XkeohEdL0EScdOrA8MWXGuR8kUfezoQsk9i/A=";
       };
 
       orca-slicer = pkgs.callPackage ./package.nix {
